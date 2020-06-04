@@ -2,7 +2,6 @@ package com.first.hello.rest;
 
 import com.first.hello.configuration.JwtTokenUtil;
 import com.first.hello.entity.User;
-import com.first.hello.model.JwtRequest;
 import com.first.hello.model.JwtResponse;
 import com.first.hello.service.UserDetailsServiceImp;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,9 +36,9 @@ public class JwtAuthenticationController {
     }
 
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
-    public ResponseEntity<?> authenticate(@RequestBody JwtRequest request) throws Exception {
-        authenticate(request.getUsername(), request.getPassword());
-        UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUsername());
+    public ResponseEntity<?> authenticate(@RequestBody User user) throws Exception {
+        authenticate(user.getUserName(), user.getPassword());
+        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUserName());
         String token = tokenUtil.generateToken(userDetails);
         return ResponseEntity.ok(new JwtResponse(token));
 
