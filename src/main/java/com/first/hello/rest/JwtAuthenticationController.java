@@ -2,7 +2,7 @@ package com.first.hello.rest;
 
 import com.first.hello.configuration.JwtTokenUtil;
 import com.first.hello.entity.User;
-import com.first.hello.model.JwtResponse;
+import com.first.hello.model.JwtTokenResponse;
 import com.first.hello.service.UserDetailsServiceImp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -40,7 +40,7 @@ public class JwtAuthenticationController {
         authenticate(user.getUserName(), user.getPassword());
         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUserName());
         String token = tokenUtil.generateToken(userDetails);
-        return ResponseEntity.ok(new JwtResponse(token));
+        return ResponseEntity.ok(new JwtTokenResponse(token));
 
     }
 
