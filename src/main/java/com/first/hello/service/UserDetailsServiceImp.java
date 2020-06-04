@@ -32,6 +32,7 @@ public class UserDetailsServiceImp implements UserDetailsService {
 
     public User save(User user) {
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        user.setRole("customer");
         return userDAO.save(user);
     }
 }
