@@ -1,5 +1,7 @@
 package com.first.hello.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -19,7 +21,11 @@ public class Product {
     private int price;
 
     @OneToMany(mappedBy = "product")
+    @JsonIgnore
     private List<Item> items;
+
+    public Product() {
+    }
 
     public Product(String productName, int price) {
         this.productName = productName;
