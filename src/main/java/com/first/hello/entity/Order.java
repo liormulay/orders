@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-@Table(name = "order")
+@Table(name = "`order`")
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,16 +27,17 @@ public class Order {
     User user;
 
     @Column(name = "total")
-    private int total;
+    private float total;
 
-    @OneToMany(mappedBy = "order")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "order")
     private List<Item> items;
 
-    public Order(Date orderDate, Date shipDate, User user, int total) {
+    public Order() {
+    }
+
+    public Order(Date orderDate, Date shipDate) {
         this.orderDate = orderDate;
         this.shipDate = shipDate;
-        this.user = user;
-        this.total = total;
     }
 
     public int getOrderId() {
@@ -71,7 +72,7 @@ public class Order {
         this.user = user;
     }
 
-    public int getTotal() {
+    public float getTotal() {
         return total;
     }
 
@@ -92,5 +93,7 @@ public class Order {
             items = new ArrayList<>();
         }
         items.add(item);
+        item.setOrder(this);
+        total += item.getProduct().getPrice() * item.getQuantity();
     }
 }

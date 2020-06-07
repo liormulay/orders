@@ -23,10 +23,11 @@ public class Item {
     @Column(name = "quantity")
     private int quantity;
 
-    public Item(Order order, Product product, int quantity) {
-        this.order = order;
-        this.product = product;
+    public Item( int quantity) {
         this.quantity = quantity;
+    }
+
+    public Item() {
     }
 
     public Order getOrder() {

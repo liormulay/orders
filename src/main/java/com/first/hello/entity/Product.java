@@ -3,6 +3,7 @@ package com.first.hello.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -12,15 +13,15 @@ public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "product_id")
-    private int product_id;
+    private int productId;
 
     @Column(name = "product_name")
     private String productName;
 
     @Column(name = "price")
-    private int price;
+    private float price;
 
-    @OneToMany(mappedBy = "product")
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Item> items;
 
@@ -32,12 +33,12 @@ public class Product {
         this.price = price;
     }
 
-    public int getProduct_id() {
-        return product_id;
+    public int getProductId() {
+        return productId;
     }
 
-    public void setProduct_id(int product_id) {
-        this.product_id = product_id;
+    public void setProductId(int productId) {
+        this.productId = productId;
     }
 
     public String getProductName() {
@@ -48,7 +49,7 @@ public class Product {
         this.productName = productName;
     }
 
-    public int getPrice() {
+    public float getPrice() {
         return price;
     }
 
@@ -62,5 +63,13 @@ public class Product {
 
     public void setItems(List<Item> items) {
         this.items = items;
+    }
+
+    public void addItem(Item item) {
+        if (items == null) {
+            items = new ArrayList<>();
+        }
+        items.add(item);
+        item.setProduct(this);
     }
 }

@@ -1,6 +1,10 @@
 package com.first.hello.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "user")
@@ -18,6 +22,10 @@ public class User {
 
     @Column(name = "role")
     private String role;
+
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
+    private List<Order> orders;
 
     public static final String CUSTOMER = "customer";
 
@@ -62,5 +70,21 @@ public class User {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public List<Order> getOrders() {
+        return orders;
+    }
+
+    public void setOrders(List<Order> orders) {
+        this.orders = orders;
+    }
+
+    public void addOrder(Order order) {
+        if (orders == null) {
+            orders = new ArrayList<>();
+        }
+        orders.add(order);
+        order.setUser(this);
     }
 }
