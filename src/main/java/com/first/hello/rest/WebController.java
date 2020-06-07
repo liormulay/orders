@@ -1,30 +1,75 @@
 package com.first.hello.rest;
 
+import com.first.hello.dao.OrderDAO;
 import com.first.hello.dao.ProductDAO;
+import com.first.hello.dao.UserDAO;
+import com.first.hello.entity.Item;
+import com.first.hello.entity.Order;
 import com.first.hello.entity.Product;
+import com.first.hello.entity.User;
+import com.first.hello.model.ItemRequest;
+import com.first.hello.model.OrderRequest;
+import com.first.hello.service.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class WebController {
 
+    private static final long TREE_DAYS = 1000 * 60 * 60 * 24 * 3;
+
     @Autowired
     private ProductDAO productDAO;
 
+    @Autowired
+    private OrderDAO orderDAO;
+
+    @Autowired
+    private SecurityService securityService;
+
+    @Autowired
+    private UserDAO userDAO;
+
     @GetMapping("/hello")
-    public String hello(){
+    public String hello() {
         return "hello";
     }
 
-    @RequestMapping(value = "/products",method = RequestMethod.GET)
-    public List<Product> getAllProducts(){
+    @RequestMapping(value = "/products", method = RequestMethod.GET)
+    public List<Product> getAllProducts() {
         return productDAO.findAll();
     }
 
+    @RequestMapping(value = "order", method = RequestMethod.POST)
+    public String makeOrder(@RequestBody OrderRequest orderRequest) throws Exception {
+        String loggedInUserName = securityService.findLoggedInUserName();
+        User loggedInUser = userDAO.findByUserName(loggedInUserName);
+        List<Item> items = new ArrayList<>();
+        Order order = new Order(new Date(System.currentTimeMillis()),
+                new Date(System.currentTimeMillis() + TREE_DAYS));
+        fillOrder(orderRequest, order);
+        loggedInUser.addOrder(order);
+        userDAO.save(loggedInUser);
+        return "You order successfully your bill is " + order.getTotal();
+    }
+
+    private void fillOrder(@RequestBody OrderRequest orderRequest, Order order) throws Exception {
+        for (ItemRequest itemRequest : orderRequest.getItemsRequest()) {
+            Optional<Product> optionalProduct = productDAO.findById(itemRequest.getProductId());
+            if (!optionalProduct.isPresent()) {
+                throw new Exception("productId hasn't found");
+            }
+            Product product = optionalProduct.get();
+            int quantity = itemRequest.getQuantity();
+            Item item = new Item(quantity);
+            product.addItem(item);
+            order.addItem(item);
+        }
+    }
 
 }
