@@ -1,7 +1,5 @@
 package com.first.hello.model;
 
-import com.first.hello.model.ItemRequest;
-
 import java.io.Serializable;
 import java.util.List;
 
