@@ -1,11 +1,14 @@
 package com.first.hello.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.io.Serializable;
 
 public class ItemRequest implements Serializable {
 
     private static final long serialVersionUID = 5301826533889876287L;
 
+    @JsonProperty("product_Id")
     private int productId;
 
     private int quantity;
