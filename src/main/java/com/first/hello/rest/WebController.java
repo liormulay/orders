@@ -7,6 +7,7 @@ import com.first.hello.entity.Item;
 import com.first.hello.entity.Order;
 import com.first.hello.entity.Product;
 import com.first.hello.entity.User;
+import com.first.hello.error.ProductNotFoundException;
 import com.first.hello.model.ItemRequest;
 import com.first.hello.model.OrderRequest;
 import com.first.hello.service.SecurityService;
@@ -46,7 +47,7 @@ public class WebController {
     }
 
     @RequestMapping(value = "order", method = RequestMethod.POST)
-    public String makeOrder(@RequestBody OrderRequest orderRequest) throws Exception {
+    public String makeOrder(@RequestBody OrderRequest orderRequest) {
         String loggedInUserName = securityService.findLoggedInUserName();
         User loggedInUser = userDAO.findByUserName(loggedInUserName);
         List<Item> items = new ArrayList<>();
@@ -58,11 +59,12 @@ public class WebController {
         return "You order successfully your bill is " + order.getTotal();
     }
 
-    private void fillOrder(@RequestBody OrderRequest orderRequest, Order order) throws Exception {
+    private void fillOrder(@RequestBody OrderRequest orderRequest, Order order) {
         for (ItemRequest itemRequest : orderRequest.getItemsRequest()) {
-            Optional<Product> optionalProduct = productDAO.findById(itemRequest.getProductId());
+            int productId = itemRequest.getProductId();
+            Optional<Product> optionalProduct = productDAO.findById(productId);
             if (!optionalProduct.isPresent()) {
-                throw new Exception("productId hasn't found");
+                throw new ProductNotFoundException("product with "+productId+" id hasn't found");
             }
             Product product = optionalProduct.get();
             int quantity = itemRequest.getQuantity();
