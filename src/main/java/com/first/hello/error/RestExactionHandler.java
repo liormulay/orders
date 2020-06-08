@@ -6,12 +6,12 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
-public class ProductRestExactionHandler {
+public class RestExactionHandler {
 
     @ExceptionHandler
-    public ResponseEntity<ProductErrorResponse> handleException(ProductNotFoundException exception) {
-        ProductErrorResponse productErrorResponse =
-                new ProductErrorResponse(HttpStatus.NOT_FOUND.value(), exception.getMessage(), System.currentTimeMillis());
+    public ResponseEntity<ErrorResponse> handleException(ProductNotFoundException exception) {
+        ErrorResponse productErrorResponse =
+                new ErrorResponse(HttpStatus.NOT_FOUND.value(), exception.getMessage(), System.currentTimeMillis());
         return new ResponseEntity<>(productErrorResponse, HttpStatus.NOT_FOUND);
     }
 }
