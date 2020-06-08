@@ -9,7 +9,9 @@ import com.first.hello.entity.Product;
 import com.first.hello.entity.User;
 import com.first.hello.error.ProductNotFoundException;
 import com.first.hello.model.ItemRequest;
+import com.first.hello.model.ItemResponse;
 import com.first.hello.model.OrderRequest;
+import com.first.hello.model.OrderResponse;
 import com.first.hello.service.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -50,7 +52,6 @@ public class WebController {
     public String makeOrder(@RequestBody OrderRequest orderRequest) {
         String loggedInUserName = securityService.findLoggedInUserName();
         User loggedInUser = userDAO.findByUserName(loggedInUserName);
-        List<Item> items = new ArrayList<>();
         Order order = new Order(new Date(System.currentTimeMillis()),
                 new Date(System.currentTimeMillis() + TREE_DAYS));
         fillOrder(orderRequest, order);
@@ -59,12 +60,12 @@ public class WebController {
         return "You order successfully your bill is " + order.getTotal();
     }
 
-    private void fillOrder(@RequestBody OrderRequest orderRequest, Order order) {
+    private void fillOrder(OrderRequest orderRequest, Order order) {
         for (ItemRequest itemRequest : orderRequest.getItemsRequest()) {
             int productId = itemRequest.getProductId();
             Optional<Product> optionalProduct = productDAO.findById(productId);
             if (!optionalProduct.isPresent()) {
-                throw new ProductNotFoundException("product with "+productId+" id hasn't found");
+                throw new ProductNotFoundException("product with " + productId + " id hasn't found");
             }
             Product product = optionalProduct.get();
             int quantity = itemRequest.getQuantity();
@@ -73,5 +74,36 @@ public class WebController {
             order.addItem(item);
         }
     }
+
+    @RequestMapping(value = "orders", method = RequestMethod.GET)
+    public List<OrderResponse> getUserOrders() {
+        String loggedInUserName = securityService.findLoggedInUserName();
+        User loggedInUser = userDAO.findByUserName(loggedInUserName);
+        List<Order> orders = orderDAO.findByUser(loggedInUser);
+        List<OrderResponse> ordersResponse = new ArrayList<>();
+        for (Order order : orders) {
+            ordersResponse.add(createOrderResponse(order));
+        }
+        return ordersResponse;
+    }
+
+    private OrderResponse createOrderResponse(Order order) {
+        List<Item> items = order.getItems();
+        List<ItemResponse> itemsResponse = new ArrayList<>();
+        for (Item item : items) {
+            Product product = item.getProduct();
+            int quantity = item.getQuantity();
+            int productId = product.getProductId();
+            String productName = product.getProductName();
+            float price = product.getPrice();
+            ItemResponse itemResponse = new ItemResponse(productId, quantity, productName, price);
+            itemsResponse.add(itemResponse);
+        }
+        float total = order.getTotal();
+        Date orderDate = order.getOrderDate();
+        Date shipDate = order.getShipDate();
+        return new OrderResponse(total, itemsResponse, orderDate, shipDate);
+    }
+
 
 }
