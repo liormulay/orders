@@ -14,4 +14,11 @@ public class RestExactionHandler {
                 new ErrorResponse(HttpStatus.NOT_FOUND.value(), exception.getMessage(), System.currentTimeMillis());
         return new ResponseEntity<>(productErrorResponse, HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler
+    public ResponseEntity<OutOfStockResponse> handleException(OutOfStockException outOfStockException){
+        OutOfStockResponse outOfStockResponse =
+                new OutOfStockResponse(outOfStockException.getOutOfStockProducts());
+        return new ResponseEntity<>(outOfStockResponse,HttpStatus.BAD_REQUEST);
+    }
 }

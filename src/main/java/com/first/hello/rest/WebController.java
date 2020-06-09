@@ -7,6 +7,7 @@ import com.first.hello.entity.Item;
 import com.first.hello.entity.Order;
 import com.first.hello.entity.Product;
 import com.first.hello.entity.User;
+import com.first.hello.error.OutOfStockException;
 import com.first.hello.error.ProductNotFoundException;
 import com.first.hello.model.*;
 import com.first.hello.service.SecurityService;
@@ -49,7 +50,7 @@ public class WebController {
     }
 
     @RequestMapping(value = "order", method = RequestMethod.POST)
-    public String makeOrder(@RequestBody OrderRequest orderRequest) throws Exception {
+    public String makeOrder(@RequestBody OrderRequest orderRequest) {
         String loggedInUserName = securityService.findLoggedInUserName();
         User loggedInUser = userDAO.findByUserName(loggedInUserName);
         Order order = new Order(new Date(System.currentTimeMillis()),
@@ -60,7 +61,9 @@ public class WebController {
         return "You order successfully your bill is " + order.getTotal();
     }
 
-    private void fillOrder(OrderRequest orderRequest, Order order) throws Exception {
+    private void fillOrder(OrderRequest orderRequest, Order order) {
+        List<Product> outOfStockProducts = new ArrayList<>();
+        boolean isOutOfStock = false;
         for (ItemRequest itemRequest : orderRequest.getItemsRequest()) {
             int productId = itemRequest.getProductId();
             Optional<Product> optionalProduct = productDAO.findById(productId);
@@ -71,12 +74,18 @@ public class WebController {
             int itemQuantity = itemRequest.getQuantity();
             int stockQuantity = product.getStockQuantity();
             if (itemQuantity > stockQuantity) {
-                throw new Exception("some of products out of stock");
+                outOfStockProducts.add(product);
+                isOutOfStock = true;
             }
-            product.setStockQuantity(stockQuantity - itemQuantity);
-            Item item = new Item(itemQuantity);
-            product.addItem(item);
-            order.addItem(item);
+            if (!isOutOfStock) {
+                product.setStockQuantity(stockQuantity - itemQuantity);
+                Item item = new Item(itemQuantity);
+                product.addItem(item);
+                order.addItem(item);
+            }
+        }
+        if (isOutOfStock){
+            throw new OutOfStockException(outOfStockProducts);
         }
     }
 
