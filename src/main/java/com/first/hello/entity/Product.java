@@ -21,6 +21,9 @@ public class Product {
     @Column(name = "price")
     private float price;
 
+    @Column(name = "stock_quantity")
+    private int stockQuantity;
+
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Item> items;
@@ -28,9 +31,22 @@ public class Product {
     public Product() {
     }
 
-    public Product(String productName, int price) {
+    public Product(String productName, float price, int stockQuantity) {
         this.productName = productName;
         this.price = price;
+        this.stockQuantity = stockQuantity;
+    }
+
+    public void setPrice(float price) {
+        this.price = price;
+    }
+
+    public int getStockQuantity() {
+        return stockQuantity;
+    }
+
+    public void setStockQuantity(int stockQuantity) {
+        this.stockQuantity = stockQuantity;
     }
 
     public int getProductId() {

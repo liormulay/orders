@@ -49,7 +49,7 @@ public class WebController {
     }
 
     @RequestMapping(value = "order", method = RequestMethod.POST)
-    public String makeOrder(@RequestBody OrderRequest orderRequest) {
+    public String makeOrder(@RequestBody OrderRequest orderRequest) throws Exception {
         String loggedInUserName = securityService.findLoggedInUserName();
         User loggedInUser = userDAO.findByUserName(loggedInUserName);
         Order order = new Order(new Date(System.currentTimeMillis()),
@@ -60,7 +60,7 @@ public class WebController {
         return "You order successfully your bill is " + order.getTotal();
     }
 
-    private void fillOrder(OrderRequest orderRequest, Order order) {
+    private void fillOrder(OrderRequest orderRequest, Order order) throws Exception {
         for (ItemRequest itemRequest : orderRequest.getItemsRequest()) {
             int productId = itemRequest.getProductId();
             Optional<Product> optionalProduct = productDAO.findById(productId);
@@ -68,8 +68,13 @@ public class WebController {
                 throw new ProductNotFoundException("product with " + productId + " id hasn't found");
             }
             Product product = optionalProduct.get();
-            int quantity = itemRequest.getQuantity();
-            Item item = new Item(quantity);
+            int itemQuantity = itemRequest.getQuantity();
+            int stockQuantity = product.getStockQuantity();
+            if (itemQuantity > stockQuantity) {
+                throw new Exception("some of products out of stock");
+            }
+            product.setStockQuantity(stockQuantity - itemQuantity);
+            Item item = new Item(itemQuantity);
             product.addItem(item);
             order.addItem(item);
         }
@@ -89,8 +94,8 @@ public class WebController {
 
 
     @PreAuthorize("hasRole('ADMIN')")
-    @RequestMapping(value = "/all_orders",method = RequestMethod.GET)
-    public List<OrderResponseWithUsername> getAllOrders(){
+    @RequestMapping(value = "/all_orders", method = RequestMethod.GET)
+    public List<OrderResponseWithUsername> getAllOrders() {
         List<Order> orders = orderDAO.findAll();
         List<OrderResponseWithUsername> ordersResponse = new ArrayList<>();
         for (Order order : orders) {
