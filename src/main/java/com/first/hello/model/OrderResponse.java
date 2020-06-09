@@ -1,6 +1,11 @@
 package com.first.hello.model;
 
+import com.first.hello.entity.Item;
+import com.first.hello.entity.Order;
+import com.first.hello.entity.Product;
+
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -8,13 +13,14 @@ public class OrderResponse implements Serializable {
 
     private static final long serialVersionUID = -6803477002090476106L;
 
-    private float total;
-
     private List<ItemResponse> items;
 
     private Date orderDate;
 
     private Date shipDate;
+
+    private float total;
+
 
     public OrderResponse(float total, List<ItemResponse> items, Date orderDate, Date shipDate) {
         this.total = total;
@@ -53,5 +59,23 @@ public class OrderResponse implements Serializable {
 
     public void setItems(List<ItemResponse> items) {
         this.items = items;
+    }
+
+    public static OrderResponse createOrderResponse(Order order) {
+        List<Item> items = order.getItems();
+        List<ItemResponse> itemsResponse = new ArrayList<>();
+        for (Item item : items) {
+            Product product = item.getProduct();
+            int quantity = item.getQuantity();
+            int productId = product.getProductId();
+            String productName = product.getProductName();
+            float price = product.getPrice();
+            ItemResponse itemResponse = new ItemResponse(productId, quantity, productName, price);
+            itemsResponse.add(itemResponse);
+        }
+        float total = order.getTotal();
+        Date orderDate = order.getOrderDate();
+        Date shipDate = order.getShipDate();
+        return new OrderResponseWithUsername(total, itemsResponse, orderDate, shipDate);
     }
 }

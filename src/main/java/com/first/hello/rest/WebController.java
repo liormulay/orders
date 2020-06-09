@@ -8,18 +8,18 @@ import com.first.hello.entity.Order;
 import com.first.hello.entity.Product;
 import com.first.hello.entity.User;
 import com.first.hello.error.ProductNotFoundException;
-import com.first.hello.model.ItemRequest;
-import com.first.hello.model.ItemResponse;
-import com.first.hello.model.OrderRequest;
-import com.first.hello.model.OrderResponse;
+import com.first.hello.model.*;
 import com.first.hello.service.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+
+import static com.first.hello.model.OrderResponse.createOrderResponse;
 
 @RestController
 public class WebController {
@@ -75,7 +75,7 @@ public class WebController {
         }
     }
 
-    @RequestMapping(value = "orders", method = RequestMethod.GET)
+    @RequestMapping(value = "/orders", method = RequestMethod.GET)
     public List<OrderResponse> getUserOrders() {
         String loggedInUserName = securityService.findLoggedInUserName();
         User loggedInUser = userDAO.findByUserName(loggedInUserName);
@@ -87,23 +87,18 @@ public class WebController {
         return ordersResponse;
     }
 
-    private OrderResponse createOrderResponse(Order order) {
-        List<Item> items = order.getItems();
-        List<ItemResponse> itemsResponse = new ArrayList<>();
-        for (Item item : items) {
-            Product product = item.getProduct();
-            int quantity = item.getQuantity();
-            int productId = product.getProductId();
-            String productName = product.getProductName();
-            float price = product.getPrice();
-            ItemResponse itemResponse = new ItemResponse(productId, quantity, productName, price);
-            itemsResponse.add(itemResponse);
-        }
-        float total = order.getTotal();
-        Date orderDate = order.getOrderDate();
-        Date shipDate = order.getShipDate();
-        return new OrderResponse(total, itemsResponse, orderDate, shipDate);
-    }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @RequestMapping(value = "/all_orders",method = RequestMethod.GET)
+    public List<OrderResponseWithUsername> getAllOrders(){
+        List<Order> orders = orderDAO.findAll();
+        List<OrderResponseWithUsername> ordersResponse = new ArrayList<>();
+        for (Order order : orders) {
+            OrderResponseWithUsername orderResponse = (OrderResponseWithUsername) createOrderResponse(order);
+            orderResponse.setUsername(order.getUser().getUserName());
+            ordersResponse.add(orderResponse);
+        }
+        return ordersResponse;
+    }
 
 }

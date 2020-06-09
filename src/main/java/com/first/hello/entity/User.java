@@ -27,13 +27,13 @@ public class User {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private List<Order> orders;
 
-    public static final String CUSTOMER = "customer";
+    public static final String ROLE_CUSTOMER = "ROLE_CUSTOMER";
 
     public User(String username, String password, String confirmPassword) {
         this.userName = username;
         this.password = password;
         this.confirmPassword = confirmPassword;
-        role = CUSTOMER;
+        role = ROLE_CUSTOMER;
     }
 
     public User() {
