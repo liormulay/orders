@@ -1,5 +1,9 @@
 package com.first.hello.model;
 
+/**
+ * Send to user list of this items wrapped in {@link OrderResponse} that he made <br>
+ * or wrapped in {@link OrderResponseWithUsername} when manger want to see the orders
+ */
 public class ItemResponse extends ItemRequest{
 
     private static final long serialVersionUID = 5741038666778991543L;

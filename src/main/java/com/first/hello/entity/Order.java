@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * Order that user made and it save in database
+ */
 @Entity
 @Table(name = "`order`")
 public class Order {

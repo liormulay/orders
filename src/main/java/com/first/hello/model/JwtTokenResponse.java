@@ -2,6 +2,9 @@ package com.first.hello.model;
 
 import java.io.Serializable;
 
+/**
+ * Model for send to user the token
+ */
 public class JwtTokenResponse implements Serializable {
 
     private static final long serialVersionUID = -8091879091924046844L;

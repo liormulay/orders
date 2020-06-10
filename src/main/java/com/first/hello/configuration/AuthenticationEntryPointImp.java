@@ -9,6 +9,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Serializable;
 
+/**
+ * Take care of the error in authorization
+ */
 @Component
 public class AuthenticationEntryPointImp implements AuthenticationEntryPoint , Serializable {
 

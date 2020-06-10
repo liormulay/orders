@@ -21,9 +21,15 @@ public class Product {
     @Column(name = "price")
     private float price;
 
+    /**
+     * The quantity of the product in the stock
+     */
     @Column(name = "stock_quantity")
     private int stockQuantity;
 
+    /**
+     * Items that have bought of this product
+     */
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Item> items;

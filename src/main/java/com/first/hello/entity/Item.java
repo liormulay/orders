@@ -2,6 +2,9 @@ package com.first.hello.entity;
 
 import javax.persistence.*;
 
+/**
+ * Item that customer bought in order
+ */
 @Entity
 @Table(name = "item")
 public class Item {

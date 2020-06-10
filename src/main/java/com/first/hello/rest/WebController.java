@@ -39,16 +39,20 @@ public class WebController {
     @Autowired
     private UserDAO userDAO;
 
-    @GetMapping("/hello")
-    public String hello() {
-        return "hello";
-    }
-
+    /**
+     * @return all products in the stock
+     */
     @RequestMapping(value = "/products", method = RequestMethod.GET)
     public List<Product> getAllProducts() {
         return productDAO.findAll();
     }
 
+    /**
+     * Use this when user wants to make an order
+     *
+     * @param orderRequest the order that user want to make
+     * @return ok message with the bill
+     */
     @RequestMapping(value = "order", method = RequestMethod.POST)
     public String makeOrder(@RequestBody OrderRequest orderRequest) {
         String loggedInUserName = securityService.findLoggedInUserName();
@@ -61,6 +65,13 @@ public class WebController {
         return "You order successfully your bill is " + order.getTotal();
     }
 
+    /**
+     * Make the order to the user check if the are enough from all that user request <br>
+     * if yes then offset this from the stock <br>
+     * if not throw error and return to the user message with the products that are not enough
+     * @param orderRequest the order that user want to make
+     * @param order that will save in the database
+     */
     private void fillOrder(OrderRequest orderRequest, Order order) {
         List<Product> outOfStockProducts = new ArrayList<>();
         boolean isOutOfStock = false;
@@ -84,11 +95,15 @@ public class WebController {
                 order.addItem(item);
             }
         }
-        if (isOutOfStock){
+        if (isOutOfStock) {
             throw new OutOfStockException(outOfStockProducts);
         }
     }
 
+    /**
+     *
+     * @return all orders that user made
+     */
     @RequestMapping(value = "/orders", method = RequestMethod.GET)
     public List<OrderResponse> getUserOrders() {
         String loggedInUserName = securityService.findLoggedInUserName();
@@ -101,7 +116,10 @@ public class WebController {
         return ordersResponse;
     }
 
-
+    /**
+     * Authorize only for admin
+     * @return all orders that have made for any user
+     */
     @PreAuthorize("hasRole('ADMIN')")
     @RequestMapping(value = "/all_orders", method = RequestMethod.GET)
     public List<OrderResponseWithUsername> getAllOrders() {

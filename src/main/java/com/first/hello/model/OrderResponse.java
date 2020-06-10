@@ -9,6 +9,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * Send this model to the user when he wants to see his orders <br>
+ * @see OrderResponseWithUsername to add this class the username
+ */
 public class OrderResponse implements Serializable {
 
     private static final long serialVersionUID = -6803477002090476106L;
@@ -61,6 +65,11 @@ public class OrderResponse implements Serializable {
         this.items = items;
     }
 
+    /**
+     * Function that recive {@link Order} object and return the corresponding {@link OrderResponse} object
+     * @param order the entity object as it saved in database
+     * @return the model that will send to the user
+     */
     public static OrderResponse createOrderResponse(Order order) {
         List<Item> items = order.getItems();
         List<ItemResponse> itemsResponse = new ArrayList<>();

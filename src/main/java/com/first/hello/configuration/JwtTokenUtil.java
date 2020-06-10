@@ -13,6 +13,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+/**
+ * Use this class for generate and validate token
+ */
 @Component
 public class JwtTokenUtil implements Serializable {
 

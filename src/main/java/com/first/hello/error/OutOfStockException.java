@@ -4,6 +4,10 @@ import com.first.hello.entity.Product;
 
 import java.util.List;
 
+/**
+ * Throw this exception if there are not enough of the products in the stock
+ * according to the order of the user
+ */
 public class OutOfStockException extends RuntimeException {
 
     private static final long serialVersionUID = -8541754809865203514L;

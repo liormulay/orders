@@ -2,6 +2,10 @@ package com.first.hello.model;
 
 import java.io.Serializable;
 
+/**
+ * User send list of this model wrapped in {@link OrderRequest}
+ * when he want to make an order
+ */
 public class ItemRequest implements Serializable {
 
     private static final long serialVersionUID = 5301826533889876287L;

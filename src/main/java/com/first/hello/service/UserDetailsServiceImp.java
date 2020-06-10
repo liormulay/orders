@@ -37,6 +37,11 @@ public class UserDetailsServiceImp implements UserDetailsService {
                 .User(user.getUserName(), user.getPassword(), authorities);
     }
 
+    /**
+     * Save new customer
+     * @param user that will be saved
+     * @return that has saved
+     */
     public User save(User user) {
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         user.setRole(ROLE_CUSTOMER);
