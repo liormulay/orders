@@ -9,11 +9,17 @@ import com.first.hello.entity.Product;
 import com.first.hello.entity.User;
 import com.first.hello.error.OutOfStockException;
 import com.first.hello.error.ProductNotFoundException;
-import com.first.hello.model.*;
+import com.first.hello.model.ItemRequest;
+import com.first.hello.model.OrderRequest;
+import com.first.hello.model.OrderResponse;
+import com.first.hello.model.OrderResponseWithUsername;
 import com.first.hello.service.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -69,8 +75,9 @@ public class WebController {
      * Make the order to the user check if the are enough from all that user request <br>
      * if yes then offset this from the stock <br>
      * if not throw error and return to the user message with the products that are not enough
+     *
      * @param orderRequest the order that user want to make
-     * @param order that will save in the database
+     * @param order        that will save in the database
      */
     private void fillOrder(OrderRequest orderRequest, Order order) {
         List<Product> outOfStockProducts = new ArrayList<>();
@@ -101,7 +108,6 @@ public class WebController {
     }
 
     /**
-     *
      * @return all orders that user made
      */
     @RequestMapping(value = "/orders", method = RequestMethod.GET)
@@ -118,6 +124,7 @@ public class WebController {
 
     /**
      * Authorize only for admin
+     *
      * @return all orders that have made for any user
      */
     @PreAuthorize("hasRole('ADMIN')")
@@ -132,5 +139,21 @@ public class WebController {
         }
         return ordersResponse;
     }
+
+    /**
+     * Save new products
+     * @param products to be saved
+     * @return ok message
+     */
+    @PreAuthorize("hasRole('ADMIN')")
+    @RequestMapping(value = "/products", method = RequestMethod.POST)
+    public String addNewProducts(@RequestBody List<Product> products) {
+        for (Product product : products) {
+            product.setProductId(0);
+            productDAO.save(product);
+        }
+        return "All products saved successfully";
+    }
+
 
 }

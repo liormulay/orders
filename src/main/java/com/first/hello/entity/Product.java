@@ -75,10 +75,6 @@ public class Product {
         return price;
     }
 
-    public void setPrice(int price) {
-        this.price = price;
-    }
-
     public List<Item> getItems() {
         return items;
     }
