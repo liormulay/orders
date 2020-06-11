@@ -18,6 +18,11 @@ public class OutOfStockException extends RuntimeException {
         this.outOfStockProducts = outOfStockProducts;
     }
 
+    public OutOfStockException(String message, List<Product> outOfStockProducts) {
+        super(message);
+        this.outOfStockProducts = outOfStockProducts;
+    }
+
     public List<Product> getOutOfStockProducts() {
         return outOfStockProducts;
     }

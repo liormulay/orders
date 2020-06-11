@@ -7,10 +7,11 @@ import com.first.hello.entity.Item;
 import com.first.hello.entity.Order;
 import com.first.hello.entity.Product;
 import com.first.hello.entity.User;
+import com.first.hello.error.NotPositiveQuantityException;
 import com.first.hello.error.OutOfStockException;
 import com.first.hello.error.ProductNotFoundException;
-import com.first.hello.model.ItemRequest;
-import com.first.hello.model.OrderRequest;
+import com.first.hello.model.ItemRequestModel;
+import com.first.hello.model.ItemsRequestModel;
 import com.first.hello.model.OrderResponse;
 import com.first.hello.model.OrderResponseWithUsername;
 import com.first.hello.service.SecurityService;
@@ -32,6 +33,8 @@ import static com.first.hello.model.OrderResponse.createOrderResponse;
 public class WebController {
 
     private static final long TREE_DAYS = 1000 * 60 * 60 * 24 * 3;
+    private static final String MISSED_ID_MESSAGE = "The following ids are missed";
+    private static final String OUT_OF_STOCK_MESSAGE = "There are not enough from those products in the stock";
 
     @Autowired
     private ProductDAO productDAO;
@@ -60,7 +63,7 @@ public class WebController {
      * @return ok message with the bill
      */
     @RequestMapping(value = "order", method = RequestMethod.POST)
-    public String makeOrder(@RequestBody OrderRequest orderRequest) {
+    public String makeOrder(@RequestBody ItemsRequestModel orderRequest) {
         String loggedInUserName = securityService.findLoggedInUserName();
         User loggedInUser = userDAO.findByUserName(loggedInUserName);
         Order order = new Order(new Date(System.currentTimeMillis()),
@@ -74,36 +77,40 @@ public class WebController {
     /**
      * Make the order to the user check if the are enough from all that user request <br>
      * if yes then offset this from the stock <br>
-     * if not throw error and return to the user message with the products that are not enough
+     * if not throw error and return to the user message with the products that are not enough<br>
+     * if some ids are missed in database it will throw only {@link ProductNotFoundException}
      *
      * @param orderRequest the order that user want to make
      * @param order        that will save in the database
      */
-    private void fillOrder(OrderRequest orderRequest, Order order) {
+    private void fillOrder(ItemsRequestModel orderRequest, Order order) {
         List<Product> outOfStockProducts = new ArrayList<>();
-        boolean isOutOfStock = false;
-        for (ItemRequest itemRequest : orderRequest.getItemsRequest()) {
-            int productId = itemRequest.getProductId();
+        List<Integer> missedIds = new ArrayList<>();
+        for (ItemRequestModel itemRequestModel : orderRequest.getItemsRequest()) {
+            int productId = itemRequestModel.getProductId();
             Optional<Product> optionalProduct = productDAO.findById(productId);
             if (!optionalProduct.isPresent()) {
-                throw new ProductNotFoundException("product with " + productId + " id hasn't found");
-            }
-            Product product = optionalProduct.get();
-            int itemQuantity = itemRequest.getQuantity();
-            int stockQuantity = product.getStockQuantity();
-            if (itemQuantity > stockQuantity) {
-                outOfStockProducts.add(product);
-                isOutOfStock = true;
-            }
-            if (!isOutOfStock) {
-                product.setStockQuantity(stockQuantity - itemQuantity);
-                Item item = new Item(itemQuantity);
-                product.addItem(item);
-                order.addItem(item);
+                missedIds.add(productId);
+            } else {
+                Product product = optionalProduct.get();
+                int itemQuantity = itemRequestModel.getQuantity();
+                int stockQuantity = product.getStockQuantity();
+                if (itemQuantity > stockQuantity) {
+                    outOfStockProducts.add(product);
+                }
+                if (outOfStockProducts.isEmpty()) {
+                    product.setStockQuantity(stockQuantity - itemQuantity);
+                    Item item = new Item(itemQuantity);
+                    product.addItem(item);
+                    order.addItem(item);
+                }
             }
         }
-        if (isOutOfStock) {
-            throw new OutOfStockException(outOfStockProducts);
+        if (!missedIds.isEmpty()) {
+            throw new ProductNotFoundException(MISSED_ID_MESSAGE, missedIds);
+        }
+        if (!outOfStockProducts.isEmpty()) {
+            throw new OutOfStockException(OUT_OF_STOCK_MESSAGE, outOfStockProducts);
         }
     }
 
@@ -142,6 +149,7 @@ public class WebController {
 
     /**
      * Save new products
+     *
      * @param products to be saved
      * @return ok message
      */
@@ -153,6 +161,55 @@ public class WebController {
             productDAO.save(product);
         }
         return "All products saved successfully";
+    }
+
+    /**
+     * Admin use this to add existing products to the stock
+     * @param itemsRequestModel contains the products that admin want to add
+     * @return ok message
+     */
+    @PreAuthorize("hasRole('ADMIN')")
+    @RequestMapping(value = "/products", method = RequestMethod.PUT)
+    public String addProductsToStock(@RequestBody ItemsRequestModel itemsRequestModel) {
+        List<ItemRequestModel> itemsRequest = itemsRequestModel.getItemsRequest();
+        validateQuantity(itemsRequest);
+        List<Integer> missedIds = new ArrayList<>();
+        List<Product> productsToSave = new ArrayList<>();
+
+        for (ItemRequestModel itemRequestModel : itemsRequest) {
+            int productId = itemRequestModel.getProductId();
+            Optional<Product> optionalProduct = productDAO.findById(productId);
+            if (!optionalProduct.isPresent()) {
+                missedIds.add(productId);
+            } else {
+                Product productToSave = optionalProduct.get();
+                productToSave.setStockQuantity(productToSave.getStockQuantity() + itemRequestModel.getQuantity());
+                productsToSave.add(productToSave);
+            }
+        }
+
+
+        if (!missedIds.isEmpty()) {
+            throw new ProductNotFoundException(MISSED_ID_MESSAGE, missedIds);
+        }
+
+        for (Product productToSave : productsToSave) {
+            productDAO.save(productToSave);
+        }
+        return "All products updated";
+
+    }
+
+    /**
+     * check that admin give only positive values to add
+     * @param modelList the items that admin sent
+     */
+    private void validateQuantity(List<ItemRequestModel> modelList) {
+        for (ItemRequestModel model : modelList) {
+            if (model.getQuantity() <= 0) {
+                throw new NotPositiveQuantityException("There is not positive quantity");
+            }
+        }
     }
 
 
