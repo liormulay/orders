@@ -9,9 +9,9 @@ public class ItemRequestModel implements Serializable {
 
     private static final long serialVersionUID = 5301826533889876287L;
 
-    private int productId;
+    int productId;
 
-    private int quantity;
+    int quantity;
 
     public ItemRequestModel(int productId, int quantity) {
         this.productId = productId;

@@ -2,6 +2,7 @@ package com.first.hello.rest;
 
 import com.first.hello.dao.OrderDAO;
 import com.first.hello.dao.ProductDAO;
+import com.first.hello.entity.Item;
 import com.first.hello.entity.Order;
 import com.first.hello.entity.Product;
 import com.first.hello.error.NotPositiveQuantityException;
@@ -9,6 +10,7 @@ import com.first.hello.error.ProductNotFoundException;
 import com.first.hello.model.ItemRequestModel;
 import com.first.hello.model.ItemsRequestModel;
 import com.first.hello.model.OrderResponseWithUsername;
+import com.first.hello.model.ProductSaleModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,8 +19,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.first.hello.model.OrderResponse.createOrderResponse;
 import static com.first.hello.rest.CustomerController.MISSED_ID_MESSAGE;
@@ -70,6 +74,7 @@ public class AdminController {
 
     /**
      * Admin use this to add existing products to the stock
+     *
      * @param itemsRequestModel contains the products that admin want to add
      * @return ok message
      */
@@ -106,6 +111,7 @@ public class AdminController {
 
     /**
      * check that admin give only positive values to add
+     *
      * @param modelList the items that admin sent
      */
     private void validateQuantity(List<ItemRequestModel> modelList) {
@@ -114,6 +120,29 @@ public class AdminController {
                 throw new NotPositiveQuantityException("There is not positive quantity");
             }
         }
+    }
+
+    /**
+     *
+     * @return list of products sorted by the amount of their total sales descendant
+     */
+    @RequestMapping(method = RequestMethod.GET, value = "/products_order_by_sale")
+    public List<ProductSaleModel> getProductsBySales() {
+        List<Product> products = productDAO.findAll();
+        List<ProductSaleModel> response = new ArrayList<>();
+        for (Product product : products) {
+            List<Item> items = product.getItems();
+            ProductSaleModel productSaleModel = new ProductSaleModel(product.getProductId(), product.getProductName());
+            if (items != null && items.size() > 0) {
+                for (Item item : items) {
+                    productSaleModel.addToQuantity(item.getQuantity());
+                }
+            }
+            response.add(productSaleModel);
+        }
+        return response.stream()
+                .sorted(Comparator.comparing(ItemRequestModel::getQuantity).reversed())
+                .collect(Collectors.toList());
     }
 
 }
