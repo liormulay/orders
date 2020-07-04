@@ -1,5 +1,7 @@
 package com.first.hello.model;
 
+import com.first.hello.entity.User;
+
 import java.io.Serializable;
 
 /**
@@ -11,11 +13,18 @@ public class JwtTokenResponse implements Serializable {
 
     private final String token;
 
-    public JwtTokenResponse(String token) {
+    private final User user;
+
+    public JwtTokenResponse(String token, User user) {
         this.token = token;
+        this.user = user;
     }
 
     public String getToken() {
         return token;
+    }
+
+    public User getUser() {
+        return user;
     }
 }

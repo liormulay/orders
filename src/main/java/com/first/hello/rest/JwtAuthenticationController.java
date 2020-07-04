@@ -1,6 +1,7 @@
 package com.first.hello.rest;
 
 import com.first.hello.configuration.JwtTokenUtil;
+import com.first.hello.dao.UserDAO;
 import com.first.hello.entity.User;
 import com.first.hello.model.JwtTokenResponse;
 import com.first.hello.service.UserDetailsServiceImp;
@@ -33,6 +34,9 @@ public class JwtAuthenticationController {
     @Autowired
     AuthenticationManager authenticationManager;
 
+    @Autowired
+    UserDAO userDAO;
+
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public ResponseEntity<?> register(@RequestBody User user) {
         return ResponseEntity.ok(userDetailsService.save(user));
@@ -41,9 +45,10 @@ public class JwtAuthenticationController {
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
     public ResponseEntity<?> authenticate(@RequestBody User user) throws Exception {
         authenticate(user.getUserName(), user.getPassword());
-        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUserName());
-        String token = tokenUtil.generateToken(userDetails);
-        return ResponseEntity.ok(new JwtTokenResponse(token));
+        user = userDAO.findByUserName(user.getUserName());
+        String token = tokenUtil.generateToken(user);
+        user.setPassword(null);
+        return ResponseEntity.ok(new JwtTokenResponse(token,user));
 
     }
 

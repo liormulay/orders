@@ -1,5 +1,6 @@
 package com.first.hello.configuration;
 
+import com.first.hello.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -55,8 +56,8 @@ public class JwtTokenUtil implements Serializable {
                 .signWith(SignatureAlgorithm.HS512, secret).compact();
     }
 
-    public String generateToken(UserDetails userDetails) {
-        return doGenerateToken(new HashMap<>(), userDetails.getUsername());
+    public String generateToken(User user) {
+        return doGenerateToken(new HashMap<>(), user.getUserName());
     }
 
     public Boolean validateToken(String token, UserDetails userDetails) {
