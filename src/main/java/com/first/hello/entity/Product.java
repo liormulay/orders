@@ -27,6 +27,9 @@ public class Product {
     @Column(name = "stock_quantity")
     private int stockQuantity;
 
+    @Column(name = "image_url")
+    private String ImageUrl;
+
     /**
      * Items that have bought of this product
      */
@@ -89,5 +92,13 @@ public class Product {
         }
         items.add(item);
         item.setProduct(this);
+    }
+
+    public String getImageUrl() {
+        return ImageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        ImageUrl = imageUrl;
     }
 }

@@ -11,6 +11,7 @@ import java.util.List;
 
 /**
  * Send this model to the user when he wants to see his orders <br>
+ *
  * @see OrderResponseWithUsername to add this class the username
  */
 public class OrderResponse implements Serializable {
@@ -67,6 +68,7 @@ public class OrderResponse implements Serializable {
 
     /**
      * Function that recive {@link Order} object and return the corresponding {@link OrderResponse} object
+     *
      * @param order the entity object as it saved in database
      * @return the model that will send to the user
      */
@@ -79,7 +81,8 @@ public class OrderResponse implements Serializable {
             int productId = product.getProductId();
             String productName = product.getProductName();
             float price = product.getPrice();
-            ItemResponse itemResponse = new ItemResponse(productId, quantity, productName, price);
+            String imageUrl = product.getImageUrl();
+            ItemResponse itemResponse = new ItemResponse(productId, quantity, productName, price, imageUrl);
             itemsResponse.add(itemResponse);
         }
         float total = order.getTotal();

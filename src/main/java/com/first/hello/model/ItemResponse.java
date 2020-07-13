@@ -12,11 +12,13 @@ public class ItemResponse extends ItemRequestModel {
 
     private float price;
 
+    private String imageUrl;
 
-    public ItemResponse(int productId, int quantity, String productName, float price) {
+    public ItemResponse(int productId, int quantity, String productName, float price, String imageUrl) {
         super(productId, quantity);
         this.productName = productName;
         this.price = price;
+        this.imageUrl = imageUrl;
     }
 
     public String getProductName() {
@@ -33,5 +35,13 @@ public class ItemResponse extends ItemRequestModel {
 
     public void setPrice(float price) {
         this.price = price;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }
