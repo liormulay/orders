@@ -10,6 +10,7 @@ import com.first.hello.entity.User;
 import com.first.hello.error.OutOfStockException;
 import com.first.hello.error.ProductNotFoundException;
 import com.first.hello.model.ItemRequestModel;
+import com.first.hello.model.ItemResponse;
 import com.first.hello.model.ItemsRequestModel;
 import com.first.hello.model.OrderResponse;
 import com.first.hello.service.SecurityService;
@@ -42,12 +43,19 @@ public class CustomerController {
     @Autowired
     private UserDAO userDAO;
 
+
     /**
-     * @return all products in the stock
+     * Use this to give to user list of products
      */
-    @RequestMapping(value = "/products", method = RequestMethod.GET)
-    public List<Product> getAllProducts() {
-        return productDAO.findAll();
+    @RequestMapping(value = "/request_items", method = RequestMethod.GET)
+    public List<ItemResponse> getProducts() {
+        List<Product> products = productDAO.findAll();
+        List<ItemResponse> itemsResponse = new ArrayList<>();
+        for (Product product : products) {
+            itemsResponse.add(new ItemResponse(product.getProductId(), 0, product.getProductName()
+                    , product.getPrice(), product.getImageUrl()));
+        }
+        return itemsResponse;
     }
 
     /**

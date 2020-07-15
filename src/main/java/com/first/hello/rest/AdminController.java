@@ -41,6 +41,14 @@ public class AdminController {
     private OrderDAO orderDAO;
 
     /**
+     * @return all products in the stock
+     */
+    @RequestMapping(value = "/products", method = RequestMethod.GET)
+    public List<Product> getAllProducts() {
+        return productDAO.findAll();
+    }
+
+    /**
      * Authorize only for admin
      *
      * @return all orders that have made for any user
