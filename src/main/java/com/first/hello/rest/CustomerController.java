@@ -65,7 +65,7 @@ public class CustomerController {
      * @return ok message with the bill
      */
     @RequestMapping(value = "/order", method = RequestMethod.POST)
-    public String makeOrder(@RequestBody ItemsRequestModel orderRequest) {
+    public OrderResponse makeOrder(@RequestBody ItemsRequestModel orderRequest) {
         String loggedInUserName = securityService.findLoggedInUserName();
         User loggedInUser = userDAO.findByUserName(loggedInUserName);
         Order order = new Order(new Date(System.currentTimeMillis()),
@@ -73,7 +73,7 @@ public class CustomerController {
         fillOrder(orderRequest, order);
         loggedInUser.addOrder(order);
         userDAO.save(loggedInUser);
-        return "You order successfully your bill is " + order.getTotal();
+        return OrderResponse.createOrderResponse(order);
     }
 
     /**
