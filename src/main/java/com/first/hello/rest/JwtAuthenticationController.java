@@ -34,7 +34,7 @@ public class JwtAuthenticationController {
     @Autowired
     UserDAO userDAO;
 
-    @RequestMapping(value = "is_username_exist/{username}", method = RequestMethod.GET)
+    @RequestMapping(value = "/is_username_exist/{username}", method = RequestMethod.GET)
     public ResponseEntity<?> isUsernameExist(@PathVariable String username) {
         return ResponseEntity.ok(userDAO.findByUserName(username) != null);
     }
