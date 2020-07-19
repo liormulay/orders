@@ -13,10 +13,7 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Controller to register and authenticate the user
@@ -37,6 +34,11 @@ public class JwtAuthenticationController {
     @Autowired
     UserDAO userDAO;
 
+    @RequestMapping(value = "is_username_exist/{username}", method = RequestMethod.GET)
+    public ResponseEntity<?> isUsernameExist(@PathVariable String username) {
+        return ResponseEntity.ok(userDAO.findByUserName(username) != null);
+    }
+
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public ResponseEntity<?> register(@RequestBody User user) {
         return ResponseEntity.ok(userDetailsService.save(user));
@@ -48,7 +50,7 @@ public class JwtAuthenticationController {
         user = userDAO.findByUserName(user.getUserName());
         String token = tokenUtil.generateToken(user);
         user.setPassword(null);
-        return ResponseEntity.ok(new JwtTokenResponse(token,user));
+        return ResponseEntity.ok(new JwtTokenResponse(token, user));
 
     }
 
