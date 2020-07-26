@@ -12,6 +12,7 @@ import com.first.hello.model.ItemsRequestModel;
 import com.first.hello.model.OrderResponseWithUsername;
 import com.first.hello.model.ProductSaleModel;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -72,12 +73,18 @@ public class AdminController {
      * @return ok message
      */
     @RequestMapping(value = "/products", method = RequestMethod.POST)
-    public String addNewProducts(@RequestBody List<Product> products) {
+    public ResponseEntity<String> addNewProducts(@RequestBody List<Product> products) {
         for (Product product : products) {
-            product.setProductId(0);
-            productDAO.save(product);
+            addNewProduct(product);
         }
-        return "All products saved successfully";
+        return ResponseEntity.ok("All products saved successfully");
+    }
+
+    @RequestMapping(value = "/product", method = RequestMethod.POST)
+    public ResponseEntity<String> addNewProduct(@RequestBody Product product) {
+        product.setProductId(0);
+        productDAO.save(product);
+        return ResponseEntity.ok("Product save successfully");
     }
 
     /**
@@ -87,7 +94,7 @@ public class AdminController {
      * @return ok message
      */
     @RequestMapping(value = "/products", method = RequestMethod.PUT)
-    public String addProductsToStock(@RequestBody ItemsRequestModel itemsRequestModel) {
+    public ResponseEntity<String> addProductsToStock(@RequestBody ItemsRequestModel itemsRequestModel) {
         List<ItemRequestModel> itemsRequest = itemsRequestModel.getItemsRequest();
         validateQuantity(itemsRequest);
         List<Integer> missedIds = new ArrayList<>();
@@ -113,7 +120,7 @@ public class AdminController {
         for (Product productToSave : productsToSave) {
             productDAO.save(productToSave);
         }
-        return "All products updated";
+        return ResponseEntity.ok("All products updated");
 
     }
 
