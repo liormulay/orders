@@ -6,9 +6,12 @@ public class ProductSaleModel extends ItemRequestModel {
 
     private String productName;
 
-    public ProductSaleModel(int productId, String productName) {
+    private String imageUrl;
+
+    public ProductSaleModel(int productId, String productName, String imageUrl) {
         super(productId, 0);
         this.productName = productName;
+        this.imageUrl = imageUrl;
     }
 
     public String getProductName() {
@@ -21,5 +24,13 @@ public class ProductSaleModel extends ItemRequestModel {
 
     public void addToQuantity(int quantity) {
         this.quantity += quantity;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }
