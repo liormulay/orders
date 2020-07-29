@@ -20,10 +20,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static com.first.hello.model.OrderResponse.createOrderResponse;
 import static com.first.hello.rest.CustomerController.MISSED_ID_MESSAGE;
@@ -138,7 +136,7 @@ public class AdminController {
     }
 
     /**
-     * @return list of products sorted by the amount of their total sales descendant
+     * @return list of products with the amount of their total sales descendant
      */
     @RequestMapping(method = RequestMethod.GET, value = "/productsOrderBySale")
     public List<ProductSaleModel> getProductsBySales() {
@@ -146,17 +144,16 @@ public class AdminController {
         List<ProductSaleModel> response = new ArrayList<>();
         for (Product product : products) {
             List<Item> items = product.getItems();
-            ProductSaleModel productSaleModel = new ProductSaleModel(product.getProductId(), product.getProductName(), product.getImageUrl());
+            ProductSaleModel productSaleModel = new ProductSaleModel(product.getProductId(), product.getProductName(),
+                    product.getPrice(), product.getStockQuantity(), product.getImageUrl());
             if (items != null && items.size() > 0) {
                 for (Item item : items) {
-                    productSaleModel.addToQuantity(item.getQuantity());
+                    productSaleModel.addToSalesQuantity(item.getQuantity());
                 }
             }
             response.add(productSaleModel);
         }
-        return response.stream()
-                .sorted(Comparator.comparing(ItemRequestModel::getQuantity).reversed())
-                .collect(Collectors.toList());
+        return response;
     }
 
 }
