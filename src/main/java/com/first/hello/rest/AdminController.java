@@ -52,7 +52,7 @@ public class AdminController {
      *
      * @return all orders that have made for any user
      */
-    @RequestMapping(value = "/allOrders", method = RequestMethod.GET)
+    @RequestMapping(value = "/all-orders", method = RequestMethod.GET)
     public List<OrderResponseWithUsername> getAllOrders() {
         List<Order> orders = orderDAO.findAll();
         List<OrderResponseWithUsername> ordersResponse = new ArrayList<>();
@@ -138,7 +138,7 @@ public class AdminController {
     /**
      * @return list of products with the amount of their total sales descendant
      */
-    @RequestMapping(method = RequestMethod.GET, value = "/productsOrderBySale")
+    @RequestMapping(method = RequestMethod.GET, value = "/products-with-sales")
     public List<ProductSaleModel> getProductsBySales() {
         List<Product> products = productDAO.findAll();
         List<ProductSaleModel> response = new ArrayList<>();

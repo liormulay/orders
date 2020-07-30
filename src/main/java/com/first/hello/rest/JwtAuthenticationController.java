@@ -11,7 +11,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,7 +33,7 @@ public class JwtAuthenticationController {
     @Autowired
     UserDAO userDAO;
 
-    @RequestMapping(value = "/is_username_exist/{username}", method = RequestMethod.GET)
+    @RequestMapping(value = "/is-username-exist/{username}", method = RequestMethod.GET)
     public ResponseEntity<?> isUsernameExist(@PathVariable String username) {
         return ResponseEntity.ok(userDAO.findByUserName(username) != null);
     }

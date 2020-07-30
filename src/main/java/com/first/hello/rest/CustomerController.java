@@ -53,7 +53,7 @@ public class CustomerController {
     /**
      * Use this to give to user list of products
      */
-    @RequestMapping(value = "/request_items", method = RequestMethod.GET)
+    @RequestMapping(value = "/request-items", method = RequestMethod.GET)
     public List<ItemResponse> getProducts() {
         List<Product> products = productDAO.findAll();
         List<ItemResponse> itemsResponse = new ArrayList<>();
