@@ -15,6 +15,7 @@ import com.first.hello.model.ItemsRequestModel;
 import com.first.hello.model.OrderResponse;
 import com.first.hello.service.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -42,6 +43,11 @@ public class CustomerController {
 
     @Autowired
     private UserDAO userDAO;
+
+    @RequestMapping(value = "/check-token", method = RequestMethod.GET)
+    public ResponseEntity<?> checkToken() {
+        return ResponseEntity.ok(true);
+    }
 
 
     /**
