@@ -19,9 +19,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Supplier;
 
 import static com.first.hello.model.OrderResponse.createOrderResponse;
 import static com.first.hello.rest.CustomerController.MISSED_ID_MESSAGE;
@@ -120,6 +119,17 @@ public class AdminController {
         }
         return ResponseEntity.ok("All products updated");
 
+    }
+
+    @RequestMapping(value = "/add-quantity-to-stock", method = RequestMethod.PUT)
+    public ResponseEntity<?> addQuantityToStock(@RequestBody ItemRequestModel itemRequestModel) throws Throwable {
+        int productId = itemRequestModel.getProductId();
+        Product product = productDAO.findById(productId)
+                .orElseThrow((Supplier<Throwable>) () ->
+                        new ProductNotFoundException(MISSED_ID_MESSAGE, Collections.singletonList(productId)));
+        product.setStockQuantity(product.getStockQuantity() + itemRequestModel.getQuantity());
+        productDAO.save(product);
+        return ResponseEntity.ok("Product was updated");
     }
 
     /**
