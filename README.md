@@ -2,7 +2,7 @@
 In this project customer can make an order see his orders ect.
 The admin can see all orders add to the stock ect.
 
-There are four entities in the database (take a look at EER diagram.png file):
+There are four entities in the database (take a look at ERD diagram.png file):
 * **User** - the user that login to the system can be customer or manager.
 * **Product** - entity for the products in the stock
 * **Item** - item has bought.  
